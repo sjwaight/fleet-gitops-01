@@ -46,7 +46,7 @@ metadata:
   namespace: aks-store-demo
 spec:
   interval: 1m
-  url: https://github.com/myorg/fleet-config
+  url: https://github.com/sjwaight/fleet-gitops-01
   ref:
     branch: main
 ---
@@ -59,8 +59,8 @@ spec:
   interval: 1m
   sourceRef:
     kind: GitRepository
-    name: fleet-config
-  path: ./podinfo
+    name: git-repo-fleet-config
+  path: ./aks-store-demo
   prune: true
   ```
 

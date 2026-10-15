@@ -4,6 +4,8 @@ metadata:
   name: aks-store-demo-flux-enable
   namespace: aks-store-demo
 spec:
+  placement:
+    name: aks-store-demo-flux-placement
   resourceSelectors:
     - group: source.toolkit.fluxcd.io
       version: v1
@@ -22,6 +24,5 @@ spec:
             - labelSelector:
                 matchExpressions: []
         jsonPatchOverrides:
-          - operator: replace
+          - op: remove
             path: /spec/suspend
-            value: false
