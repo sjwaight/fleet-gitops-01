@@ -1,0 +1,27 @@
+apiVersion: placement.kubernetes-fleet.io/v1
+kind: ResourceOverride
+metadata:
+  name: aks-store-demo-flux-enable
+  namespace: aks-store-demo
+spec:
+  resourceSelectors:
+    - group: source.toolkit.fluxcd.io
+      version: v1
+      kind: OCIRepository
+      name: aks-store-demo-source
+
+    - group: kustomize.toolkit.fluxcd.io
+      version: v1
+      kind: Kustomization
+      name: aks-store-demo-kustomize
+
+  policy:
+    overrideRules:
+      - clusterSelector:
+          clusterSelectorTerms:
+            - labelSelector:
+                matchExpressions: []
+        jsonPatchOverrides:
+          - operator: replace
+            path: /spec/suspend
+            value: false
