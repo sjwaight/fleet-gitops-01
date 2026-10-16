@@ -4,76 +4,76 @@
 
 1. Distribute the new namespace all member clusters, exluding any existing or future child resources by specifying `selectionScope: NamespaceOnly`.
 
-```yaml
-apiVersion: placement.kubernetes-fleet.io/v1
-kind: ClusterResourcePlacement
-metadata:
-  name: distribute-test-app
-spec:
-  resourceSelectors:
-    - group: ""
-      kind: Namespace
-      version: v1          
-      name: aks-store-demo
-      selectionScope: NamespaceOnly
-  policy:
-    placementType: PickAll
-```
+  ```yaml
+  apiVersion: placement.kubernetes-fleet.io/v1
+  kind: ClusterResourcePlacement
+  metadata:
+    name: distribute-test-app
+  spec:
+    resourceSelectors:
+      - group: ""
+        kind: Namespace
+        version: v1          
+        name: aks-store-demo
+        selectionScope: NamespaceOnly
+    policy:
+      placementType: PickAll
+  ```
 
 1. Authorize the `flux-applier` user on the hub cluster to manage resources in the newly created namespace. Modify `rules` to meet your requirements. In this configuration Flux can manage any resoure type in the `aks-store-demo` namespace.
 
-```yaml
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: flux-applier
-  namespace: aks-store-demo
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: flux-applier
-  namespace: aks-store-demo
-rules:
-  - apiGroups: ["*"]
-    resources: ["*"]
-    verbs: ["*"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: flux-applier
-  namespace: aks-store-demo
-subjects:
-  - kind: ServiceAccount
+  ```yaml
+  apiVersion: v1
+  kind: ServiceAccount
+  metadata:
     name: flux-applier
     namespace: aks-store-demo
-roleRef:
+  ---
+  apiVersion: rbac.authorization.k8s.io/v1
   kind: Role
-  name: flux-applier
-  apiGroup: rbac.authorization.k8s.io
-```
+  metadata:
+    name: flux-applier
+    namespace: aks-store-demo
+  rules:
+    - apiGroups: ["*"]
+      resources: ["*"]
+      verbs: ["*"]
+  ---
+  apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    name: flux-applier
+    namespace: aks-store-demo
+  subjects:
+    - kind: ServiceAccount
+      name: flux-applier
+      namespace: aks-store-demo
+  roleRef:
+    kind: Role
+    name: flux-applier
+    apiGroup: rbac.authorization.k8s.io
+  ```
 
 1. Bootstrap your configuration by applying these resources to the `aks-store-demo` namespace on the Fleet Manager hub cluster.
 
-```yaml
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: GitRepository
-metadata:
+  ```yaml
+  apiVersion: source.toolkit.fluxcd.io/v1
+  kind: GitRepository
+  metadata:
   name: git-repo-fleet-config
   namespace: aks-store-demo
-spec:
+  spec:
   interval: 1m
   url: https://github.com/sjwaight/fleet-gitops-01
   ref:
     branch: main
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
+  ---
+  apiVersion: kustomize.toolkit.fluxcd.io/v1
+  kind: Kustomization
+  metadata:
   name: kustonize-fleet-config
   namespace: aks-store-demo
-spec:
+  spec:
   interval: 1m
   sourceRef:
     kind: GitRepository
@@ -90,6 +90,8 @@ The OCIRepository and Kustomization resources are distributed to member clusters
 
 1. Enable the Flux extension on member clusters (AKS or Arc-enabled Kubernetes)
 
-```bash
-az k8s-extension create --resource-group {rg-test-group} --cluster-name {cluster-name} --cluster-type managedClusters --name flux --extension-type microsoft.flux
-```
+  ```bash
+  az k8s-extension create --resource-group {rg-test-group} --cluster-name {cluster-name} --cluster-type managedClusters --name flux --extension-type microsoft.flux
+  ```
+
+1. As we don't use the FluxConfig ARM resource to configure this cluster, we must manually authorize the `flux-applier` so that the Kustomize controller works as expected. Patch using the same YAML as shown above.
