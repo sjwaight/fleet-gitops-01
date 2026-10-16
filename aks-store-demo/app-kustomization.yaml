@@ -4,7 +4,6 @@ metadata:
   name: aks-store-demo-kustomize
   namespace: aks-store-demo
 spec:
-  suspend: true
   interval: 10m
   path: ./
   prune: true
