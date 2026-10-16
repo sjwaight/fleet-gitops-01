@@ -104,3 +104,19 @@ The OCIRepository and Kustomization resources are distributed to member clusters
 1. As we don't use the FluxConfig ARM resource to configure this cluster, we must manually authorize the `flux-applier` so that the Kustomize controller works as expected. Patch using the same YAML as shown above.
 
 > NOTE: assumption is that if a cluster has the ARM extension already installed it likely also has a FluxConfig ARM resource in place that has already authorized `flux-applier`.
+
+## View the running application
+
+You can view the workloads and services configured by the sample application on the member clusters.
+
+### Workloads
+
+![Application workloads](./img/petstore-workloads.png)
+
+### Services
+
+![Application services](./img/petstore-services.png)
+
+View the admin and store front web applications by selecting the `External IP` which will open them in the web browser.
+
+![Application services](./img/petstore-storefront.png)
