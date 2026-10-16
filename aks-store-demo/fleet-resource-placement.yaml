@@ -13,7 +13,7 @@ spec:
     - group: kustomize.toolkit.fluxcd.io
       version: v1
       kind: Kustomization
-      name: paks-store-demo-kustomize
+      name: aks-store-demo-kustomize
 
   policy:
     placementType: PickAll
