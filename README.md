@@ -2,6 +2,24 @@
 
 1. Create a namespace on your Fleet Manager hub cluster named `aks-store-demo`.
 
+1. Distribute the new namespace all member clusters, exluding any existing or future child resources by specifying `selectionScope: NamespaceOnly`.
+
+```yaml
+apiVersion: placement.kubernetes-fleet.io/v1
+kind: ClusterResourcePlacement
+metadata:
+  name: distribute-test-app
+spec:
+  resourceSelectors:
+    - group: ""
+      kind: Namespace
+      version: v1          
+      name: aks-store-demo
+      selectionScope: NamespaceOnly
+  policy:
+    placementType: PickAll
+```
+
 1. Authorize the `flux-applier` user on the hub cluster to manage resources in the newly created namespace. Modify `rules` to meet your requirements. In this configuration Flux can manage any resoure type in the `aks-store-demo` namespace.
 
 ```yaml
