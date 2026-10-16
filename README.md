@@ -1,8 +1,14 @@
 # fleet-gitops-01
 
+1. Enable Flux extention on the Fleet Manager - requires a hub cluster.
+
+  ```bash
+  az k8s-extension create --resource-group {rg-fleet-test-group} --cluster-name {fleet-name} --cluster-type fleets --name flux --extension-type microsoft.flux
+  ```
+
 1. Create a namespace on your Fleet Manager hub cluster named `aks-store-demo`.
 
-1. Distribute the new namespace all member clusters, exluding any existing or future child resources by specifying `selectionScope: NamespaceOnly`.
+1. Distribute the new namespace all member clusters, exluding any existing or future child resources by specifying `selectionScope: NamespaceOnly`. You can create the on the Fleet Manager hub cluster manually via `kubectl` or via the Azure portal. If you use the Azure portal you need to manually add the `selectionScope` before applying.
 
   ```yaml
   apiVersion: placement.kubernetes-fleet.io/v1
@@ -20,7 +26,7 @@
       placementType: PickAll
   ```
 
-1. Authorize the `flux-applier` user on the hub cluster to manage resources in the newly created namespace. Modify `rules` to meet your requirements. In this configuration Flux can manage any resoure type in the `aks-store-demo` namespace.
+1. Authorize the `flux-applier` user on the hub cluster to manage resources in the newly created namespace. Modify `rules` to meet your requirements. In this configuration Flux can manage any resoure type in the `aks-store-demo` namespace. You can apply via `kubectl` on the hub cluster, or via the Azure portal by using the *Apply YAML* option, pasting in the below and then applying.
 
   ```yaml
   apiVersion: v1
@@ -54,7 +60,8 @@
     apiGroup: rbac.authorization.k8s.io
   ```
 
-1. Bootstrap your configuration by applying these resources to the `aks-store-demo` namespace on the Fleet Manager hub cluster.
+1. Bootstrap your configuration by applying these resources to the `aks-store-demo` namespace on the Fleet Manager hub cluster. You can create the on the Fleet Manager hub cluster manually via `kubectl` or via the Azure portal by using the *Apply YAML* option, pasting in the below and then applying.
+
 
   ```yaml
   apiVersion: source.toolkit.fluxcd.io/v1
@@ -95,3 +102,5 @@ The OCIRepository and Kustomization resources are distributed to member clusters
   ```
 
 1. As we don't use the FluxConfig ARM resource to configure this cluster, we must manually authorize the `flux-applier` so that the Kustomize controller works as expected. Patch using the same YAML as shown above.
+
+> NOTE: assumption is that if a cluster has the ARM extension already installed it likely also has a FluxConfig ARM resource in place that has already authorized `flux-applier`.
