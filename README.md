@@ -65,3 +65,13 @@ spec:
   ```
 
 The resources contained in the aks-store-demo folder will be syncronized by Flux to the Fleet Manager hub cluster, then distributed to member clusters using Fleet Manager resource placement.
+
+## Enable Flux on member clusters
+
+The OCIRepository and Kustomization resources are distributed to member clusters, leaving local reconciliation to Flux on the cluster.
+
+1. Enable the Flux extension on member clusters (AKS or Arc-enabled Kubernetes)
+
+```bash
+az k8s-extension create --resource-group {rg-test-group} --cluster-name {cluster-name} --cluster-type managedClusters --name flux --extension-type microsoft.flux
+```
