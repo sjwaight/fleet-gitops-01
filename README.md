@@ -28,6 +28,8 @@
 
 1. Authorize the `flux-applier` user on the hub cluster to manage resources in the newly created namespace. Modify `rules` to meet your requirements. In this configuration Flux can manage any resoure type in the `aks-store-demo` namespace. You can apply via `kubectl` on the hub cluster, or via the Azure portal by using the *Apply YAML* option, pasting in the below and then applying.
 
+> NOTE: you can use a `ResourcePlacement` to distribute this mapping across member clusters as required.
+
   ```yaml
   apiVersion: v1
   kind: ServiceAccount
@@ -62,7 +64,6 @@
 
 1. Bootstrap your configuration by applying these resources to the `aks-store-demo` namespace on the Fleet Manager hub cluster. You can create the on the Fleet Manager hub cluster manually via `kubectl` or via the Azure portal by using the *Apply YAML* option, pasting in the below and then applying.
 
-
   ```yaml
   apiVersion: source.toolkit.fluxcd.io/v1
   kind: GitRepository
@@ -90,6 +91,21 @@
   ```
 
 The resources contained in the aks-store-demo folder will be syncronized by Flux to the Fleet Manager hub cluster, then distributed to member clusters using Fleet Manager resource placement.
+
+### What happens on the hub cluster?
+
+When Flux synchronizes the GitRepo source, the manifests in the `aks-store-demo` folder are applied and the Kustomization runs.
+
+The file contents in the folder perform the following function:
+
+[app-kustomization.yaml](./aks-store-demo/app-kustomization.yaml) - Kustomization that runs on each member cluster, deploying the contents of the OCIRepository.
+[app-source.yaml](./aks-store-demo/app-source.yaml) - OCIRepository source that points to the artifact to deploy. 
+[fleet-resource-override.yaml](./aks-store-demo/fleet-resource-override.yaml) - A Fleet Manager resource placement override that removes the `suspend` from the app components when they are distributed to member clusters.
+[fleet-resource-placement.yaml](./aks-store-demo/fleet-resource-placement.yaml) - A Fleet Manager resource placement that selects the OCIRepository and Kustomization resources and distributes them to all clusters.
+[hub-kustomization.yaml](./aks-store-demo/hub-kustomization.yaml) - Kustomization that runs on the Fleet Manager hub cluster and is responsible for processing the manifests in the folder.
+
+> Note: both app components are bundled with `suspend` set to `true` so that the resources aren't reconciled on the Fleet Manager hub cluster. The hub cluster can't schedule workloads, so there's no impact other than an unecessary use of scheduler time on the hub.
+
 
 ## Enable Flux on member clusters
 
