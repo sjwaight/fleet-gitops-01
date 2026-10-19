@@ -98,11 +98,11 @@ When Flux synchronizes the GitRepo source, the manifests in the `aks-store-demo`
 
 The file contents in the folder perform the following function:
 
-[app-kustomization.yaml](./aks-store-demo/app-kustomization.yaml) - Kustomization that runs on each member cluster, deploying the contents of the OCIRepository.
-[app-source.yaml](./aks-store-demo/app-source.yaml) - OCIRepository source that points to the artifact to deploy. 
-[fleet-resource-override.yaml](./aks-store-demo/fleet-resource-override.yaml) - A Fleet Manager resource placement override that removes the `suspend` from the app components when they are distributed to member clusters.
-[fleet-resource-placement.yaml](./aks-store-demo/fleet-resource-placement.yaml) - A Fleet Manager resource placement that selects the OCIRepository and Kustomization resources and distributes them to all clusters.
-[hub-kustomization.yaml](./aks-store-demo/hub-kustomization.yaml) - Kustomization that runs on the Fleet Manager hub cluster and is responsible for processing the manifests in the folder.
+- [app-kustomization.yaml](./aks-store-demo/app-kustomization.yaml) - Kustomization that runs on each member cluster, deploying the contents of the OCIRepository.
+- [app-source.yaml](./aks-store-demo/app-source.yaml) - OCIRepository source that points to the artifact to deploy. 
+- [fleet-resource-override.yaml](./aks-store-demo/fleet-resource-override.yaml) - A Fleet Manager resource placement override that removes the `suspend` from the app components when they are distributed to member clusters.
+- [fleet-resource-placement.yaml](./aks-store-demo/fleet-resource-placement.yaml) - A Fleet Manager resource placement that selects the OCIRepository and Kustomization resources and distributes them to all clusters.
+- [hub-kustomization.yaml](./aks-store-demo/hub-kustomization.yaml) - Kustomization that runs on the Fleet Manager hub cluster and is responsible for processing the manifests in the folder.
 
 > Note: both app components are bundled with `suspend` set to `true` so that the resources aren't reconciled on the Fleet Manager hub cluster. The hub cluster can't schedule workloads, so there's no impact other than an unecessary use of scheduler time on the hub.
 
