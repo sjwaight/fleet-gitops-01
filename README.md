@@ -7,7 +7,12 @@ regions are configured in [infra/terraform.tfvars](./infra/terraform.tfvars).
 1. Enable Flux extention on the Fleet Manager - requires a hub cluster.
 
   ```bash
-  az k8s-extension create --resource-group {rg-fleet-test-group} --cluster-name {fleet-name} --cluster-type fleets --name flux --extension-type microsoft.flux
+  az k8s-extension create \
+    --resource-group {rg-fleet-test-group} \
+    --cluster-name {fleet-name} \
+    --cluster-type fleets \
+    --name flux \
+    --extension-type microsoft.flux
   ```
 
 1. Create a namespace on your Fleet Manager hub cluster named `aks-store-demo`.
