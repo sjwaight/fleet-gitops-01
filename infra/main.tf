@@ -19,6 +19,9 @@ resource "azapi_resource" "fleet" {
     properties = {
       hubProfile = {
         dnsPrefix = var.fleet.dns_prefix
+        agentProfile = {
+            vmSize = var.fleet.vm_size
+        }
         apiServerAccessProfile = {
           enablePrivateCluster = false
         }

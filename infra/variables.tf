@@ -12,6 +12,7 @@ variable "fleet" {
     name       = string
     location   = string
     dns_prefix = string
+    vm_size    = optional(string, "Standard_D2s_v5")
   })
 }
 
