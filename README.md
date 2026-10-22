@@ -1,9 +1,18 @@
 # fleet-gitops-01
 
+To provision a public-hub Fleet Manager and two two-node AKS member clusters with
+Flux enabled, see [infra/README.md](./infra/README.md). Resource names and Azure
+regions are configured in [infra/terraform.tfvars](./infra/terraform.tfvars).
+
 1. Enable Flux extention on the Fleet Manager - requires a hub cluster.
 
   ```bash
-  az k8s-extension create --resource-group {rg-fleet-test-group} --cluster-name {fleet-name} --cluster-type fleets --name flux --extension-type microsoft.flux
+  az k8s-extension create \
+    --resource-group {rg-fleet-test-group} \
+    --cluster-name {fleet-name} \
+    --cluster-type fleets \
+    --name flux \
+    --extension-type microsoft.flux
   ```
 
 1. Create a namespace on your Fleet Manager hub cluster named `aks-store-demo`.
@@ -64,37 +73,40 @@
 
 1. Bootstrap your configuration by applying these resources to the `aks-store-demo` namespace on the Fleet Manager hub cluster. You can create the on the Fleet Manager hub cluster manually via `kubectl` or via the Azure portal by using the *Apply YAML* option, pasting in the below and then applying.
 
+    1. Try the OCI deployment by setting `spec.path` in the `Kustomization` to point at [./aks-store-demo-oci](./aks-store-demo-oci).
+    1. Try the Helm deployment by setting `spec.path` in the `Kustomization` to point at [./aks-store-demo-helm](./aks-store-demo-helm).
+
   ```yaml
   apiVersion: source.toolkit.fluxcd.io/v1
   kind: GitRepository
   metadata:
-  name: git-repo-fleet-config
-  namespace: aks-store-demo
+      name: git-repo-fleet-config
+      namespace: aks-store-demo
   spec:
-  interval: 1m
-  url: https://github.com/sjwaight/fleet-gitops-01
-  ref:
-    branch: main
+      interval: 1m
+      url: https://github.com/sjwaight/fleet-gitops-01
+      ref:
+        branch: main
   ---
   apiVersion: kustomize.toolkit.fluxcd.io/v1
   kind: Kustomization
   metadata:
-  name: kustonize-fleet-config
-  namespace: aks-store-demo
+      name: kustomize-fleet-config
+      namespace: aks-store-demo
   spec:
-  interval: 1m
-  sourceRef:
-    kind: GitRepository
-    name: git-repo-fleet-config
-  path: ./aks-store-demo
-  prune: true
+      interval: 1m
+      sourceRef:
+        kind: GitRepository
+        name: git-repo-fleet-config
+      path: ./aks-store-demo-helm
+      prune: true
   ```
 
 The resources contained in the aks-store-demo folder will be syncronized by Flux to the Fleet Manager hub cluster, then distributed to member clusters using Fleet Manager resource placement.
 
 ### What happens on the hub cluster?
 
-When Flux synchronizes the GitRepo source, the manifests in the `aks-store-demo` folder are applied and the Kustomization runs.
+When Flux synchronizes the GitRepo source, the manifests in the selected folder are applied and the Kustomization runs.
 
 The file contents in the folder perform the following function:
 
@@ -114,7 +126,12 @@ The OCIRepository and Kustomization resources are distributed to member clusters
 1. Enable the Flux extension on member clusters (AKS or Arc-enabled Kubernetes)
 
   ```bash
-  az k8s-extension create --resource-group {rg-test-group} --cluster-name {cluster-name} --cluster-type managedClusters --name flux --extension-type microsoft.flux
+  az k8s-extension create \ 
+    --resource-group {rg-test-group} \
+    --cluster-name {cluster-name} \
+    --cluster-type managedClusters \
+    --name flux \
+        --extension-type microsoft.flux
   ```
 
 1. As we don't use the FluxConfig ARM resource to configure this cluster, we must manually authorize the `flux-applier` so that the Kustomize controller works as expected. Patch using the same YAML as shown above.
