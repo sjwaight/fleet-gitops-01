@@ -5,7 +5,7 @@ resource_group = {
 
 fleet = {
   name       = "fleet-gitops-01"
-  location   = "eastus
+  location   = "eastus"
   dns_prefix = "fleet-gitops-01"
   vm_size    = "Standard_D2s_v5"
 }
