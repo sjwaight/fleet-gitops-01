@@ -1,5 +1,9 @@
 # fleet-gitops-01
 
+To provision a public-hub Fleet Manager and two two-node AKS member clusters with
+Flux enabled, see [infra/README.md](./infra/README.md). Resource names and Azure
+regions are configured in [infra/terraform.tfvars](./infra/terraform.tfvars).
+
 1. Enable Flux extention on the Fleet Manager - requires a hub cluster.
 
   ```bash
